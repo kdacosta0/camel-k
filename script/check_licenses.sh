@@ -18,7 +18,7 @@
 location=$(dirname $0)
 rootdir=$location/../
 
-blacklist=("zz_generated" "zz_desc_generated" "./.mvn/wrapper" "./docs/" "./.idea" "./build/" "./deploy/traits.yaml")
+blacklist=("zz_generated" "zz_desc_generated" "vendor" "./.mvn/wrapper" "./docs/" "./.idea" "./build/" "./deploy/traits.yaml" "./pom.xml")
 
 cd $rootdir
 go build ./cmd/util/license-check/

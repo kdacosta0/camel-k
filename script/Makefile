@@ -24,7 +24,7 @@ INSTALL_DEFAULT_KAMELETS := true
 CONTROLLER_GEN_VERSION := v0.4.1
 OPERATOR_SDK_VERSION := v1.14.0
 KUSTOMIZE_VERSION := v4.1.2
-BASE_IMAGE := adoptopenjdk/openjdk11:slim
+BASE_IMAGE := registry.access.redhat.com/ubi8/openjdk-11:1.10
 LOCAL_REPOSITORY := /tmp/artifacts/m2
 IMAGE_NAME := registry-proxy.engineering.redhat.com/rh-osbs/integration-camel-k-rhel8-operator
 
@@ -42,7 +42,12 @@ CUSTOM_TAG ?= $(OPERATOR_VERSION)
 METADATA_IMAGE_NAME := $(CUSTOM_IMAGE)-metadata
 BUNDLE_IMAGE_NAME ?= $(CUSTOM_IMAGE)-bundle
 RELEASE_GIT_REMOTE := upstream
-GIT_COMMIT := $(shell git rev-list -1 HEAD)
+ifeq (, $(shell command -v git 2> /dev/null))
+GIT_COMMIT=$(shell git rev-list -1 HEAD)
+else
+GIT_COMMIT=release-$(CUSTOM_VERSION)
+endif
+
 LINT_GOGC := 10
 LINT_DEADLINE := 10m
 
@@ -179,7 +184,10 @@ generate-strimzi:
 	cd addons/strimzi/duck && $(CONTROLLER_GEN) paths="./..." object
 	./script/gen_client_strimzi.sh
 
+
 build: build-resources build-kamel build-compile-integration-tests build-submodules
+
+ci-build: clean codegen set-module-version set-version build-generate check-licenses dir-licenses build-kamel
 
 test: build
 	go test ./...
@@ -226,9 +234,11 @@ else
 	go build $(GOFLAGS) -o kamel ./cmd/kamel/*.go
 endif
 
-build-resources:
-	./script/build_catalog.sh $(RUNTIME_VERSION) -Dcatalog.file=camel-catalog-$(RUNTIME_VERSION).yaml -Dcatalog.runtime=quarkus -Dstaging.repo="$(STAGING_RUNTIME_REPO)"
+build-generate:
 	go generate -mod=vendor ./pkg/...
+
+build-resources: build-generate
+	./script/build_catalog.sh $(RUNTIME_VERSION) -Dcatalog.file=camel-catalog-$(RUNTIME_VERSION).yaml -Dcatalog.runtime=quarkus -Dstaging.repo="$(STAGING_RUNTIME_REPO)"
 
 bundle-kamelets:
 ifneq (,$(findstring release,$(MAKECMDGOALS)))
@@ -248,7 +258,7 @@ build-compile-integration-tests:
 	go test -c -tags="integration" ./e2e/builder
 
 clean:
-	# disable gomodules when executing go clean:
+	# disabling gomodules when executing go clean:
 	#
 	#    https://github.com/golang/go/issues/31002
 	#
@@ -280,6 +290,9 @@ lint-fix:
 
 check-licenses:
 	./script/check_licenses.sh
+
+dir-licenses:
+	./script/vendor-license-directory.sh
 
 maven-overlay:
 	mkdir -p build/_maven_overlay
@@ -355,7 +368,7 @@ install-minikube:
 get-staging-repo:
 	@echo $(or ${STAGING_RUNTIME_REPO},https://repository.apache.org/content/repositories/snapshots@id=apache-snapshots@snapshots)
 
-.PHONY: build build-kamel build-resources dep codegen images images-dev images-push images-push-staging test check test-integration clean release cross-compile package-examples set-version git-tag release-notes check-licenses generate-deepcopy generate-client generate-doc build-resources release-helm release-staging release-nightly get-staging-repo get-version build-submodules set-module-version bundle-kamelets generate-strimzi
+.PHONY: build build-kamel build-resources build-generate dep codegen images images-dev images-push images-push-staging test check test-integration clean release cross-compile package-examples set-version git-tag release-notes check-licenses generate-deepcopy generate-client generate-doc release-helm release-staging release-nightly get-staging-repo get-version build-submodules set-module-version bundle-kamelets generate-strimzi
 .PHONY: controller-gen kubectl kustomize operator-sdk
 
 # find or download controller-gen if necessary

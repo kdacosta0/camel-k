@@ -27,35 +27,64 @@ version=$1
 image_name=${2:-docker.io\/apache\/camel-k}
 sanitized_image_name=${image_name//\//\\\/}
 
+if [ -d $location/../config/manager ]; then
+  for f in $(find $location/../config/manager -type f -name "*.yaml");
+  do
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      # Mac OSX
+      sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
+    fi
+  done
+fi
 
-for f in $(find $location/../config/manager -type f -name "*.yaml");
-do
-  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
-  fi
-done
-
-for f in $(find $location/../config/manifests/bases -type f -name "*.yaml");
-do
-  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
-  fi
-done
+if [ -d $location/../config/manifests/bases ]; then
+  for f in $(find $location/../config/manifests/bases -type f -name "*.yaml");
+  do
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      # Mac OSX
+      sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $f
+    fi
+  done
+fi
 
 # Update helm chart
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $location/../helm/camel-k/values.yaml
-  sed -i -r "s/appVersion:\s([0-9]+[a-zA-Z0-9\-\.].*).*/appVersion: ${version}/" $location/../helm/camel-k/Chart.yaml
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  # Mac OSX
-  sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $location/../helm/camel-k/values.yaml
-  sed -i '' -E "s/appVersion:\s([0-9]+[a-zA-Z0-9\-\.].*).*/appVersion: ${version}/" $location/../helm/camel-k/Chart.yaml
+if [ -d $location/../helm/camel-k ]; then
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed -i -r "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $location/../helm/camel-k/values.yaml
+    sed -i -r "s/appVersion:\s([0-9]+[a-zA-Z0-9\-\.].*).*/appVersion: ${version}/" $location/../helm/camel-k/Chart.yaml
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    sed -i '' -E "s/docker.io\/apache\/camel-k:([0-9]+[a-zA-Z0-9\-\.].*).*/${sanitized_image_name}:${version}/" $location/../helm/camel-k/values.yaml
+    sed -i '' -E "s/appVersion:\s([0-9]+[a-zA-Z0-9\-\.].*).*/appVersion: ${version}/" $location/../helm/camel-k/Chart.yaml
+  fi
+fi
+
+if [ -f $location/../go.mod ]; then
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed -i "s~github\.com/apache/camel\-k/pkg/apis/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/apis/camel v$version~" $location/../go.mod
+    sed -i "s~github\.com/apache/camel\-k/pkg/client/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/client/camel v$version~" $location/../go.mod
+    sed -i "s~github\.com/apache/camel\-k/pkg/kamelet/repository v[0-9.]\+~github\.com/apache/camel\-k/pkg/kamelet/repository v$version~" $location/../go.mod
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i "s~github\.com/apache/camel\-k/pkg/apis/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/apis/camel v$version~" $location/../go.mod
+    sed -i "s~github\.com/apache/camel\-k/pkg/client/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/client/camel v$version~" $location/../go.mod
+    sed -i "s~github\.com/apache/camel\-k/pkg/kamelet/repository v[0-9.]\+~github\.com/apache/camel\-k/pkg/kamelet/repository v$version~" $location/../go.mod
+  fi
+fi
+
+if [ -f $location/../vendor/modules.txt ]; then
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed -i "s~github\.com/apache/camel\-k/pkg/apis/camel v[0-9.]\+ \(.*\)~github\.com/apache/camel\-k/pkg/apis/camel v$version \1~" $location/../vendor/modules.txt
+    sed -i "s~github\.com/apache/camel\-k/pkg/client/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/client/camel v$version~" $location/../vendor/modules.txt
+    sed -i "s~github\.com/apache/camel\-k/pkg/kamelet/repository v[0-9.]\+~github\.com/apache/camel\-k/pkg/kamelet/repository v$version~" $location/../vendor/modules.txt
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' -E "s~github\.com/apache/camel\-k/pkg/apis/camel v[0-9.]\+ \(.*\)~github\.com/apache/camel\-k/pkg/apis/camel v$version \1~" $location/../vendor/modules.txt
+    sed -i '' -E "s~github\.com/apache/camel\-k/pkg/client/camel v[0-9.]\+~github\.com/apache/camel\-k/pkg/client/camel v$version~" $location/../vendor/modules.txt
+    sed -i '' -E "s~github\.com/apache/camel\-k/pkg/kamelet/repository v[0-9.]\+~github\.com/apache/camel\-k/pkg/kamelet/repository v$version~" $location/../vendor/modules.txt
+  fi
 fi
 
 echo "Camel K version set to: $version and image name to: $image_name"

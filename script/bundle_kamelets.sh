@@ -47,3 +47,8 @@ git clone -b $branch --single-branch --depth 1 $repo ./tmp_kamelet_catalog
 cp ./tmp_kamelet_catalog/*.kamelet.yaml $target
 
 rm -rf ./tmp_kamelet_catalog
+
+#
+# Check that all the kamelets have licences
+#
+./script/add_license.sh $target ./script/headers/yaml.txt

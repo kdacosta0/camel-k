@@ -1,0 +1,124 @@
+FROM registry.redhat.io/rhel8/go-toolset:1.15.14-10 AS builder
+
+ENV GOPATH=/go
+
+#
+# Constants should be set in the Makefile
+#
+ENV CAMEL_K_WORK=/go/src/github.com/apache/camel-k
+
+USER root
+
+#
+# Install tools for building
+#
+RUN yum --disableplugin=subscription-manager install -y make && yum clean all
+
+RUN mkdir -p ${CAMEL_K_WORK}
+
+#
+# TODO
+# camel-catalog should already be generated and provided
+# The file is baked contents is embedded into the resources of the binary
+#
+COPY deploy ${CAMEL_K_WORK}/deploy
+
+#
+# Source files for building go operator binary
+#
+COPY addons ${CAMEL_K_WORK}/addons
+COPY cmd ${CAMEL_K_WORK}/cmd
+COPY config ${CAMEL_K_WORK}/config
+COPY pkg ${CAMEL_K_WORK}/pkg
+COPY script ${CAMEL_K_WORK}/script
+COPY vendor ${CAMEL_K_WORK}/vendor
+COPY go.* ${CAMEL_K_WORK}/
+COPY Makefile ${CAMEL_K_WORK}/
+COPY pom.xml ${CAMEL_K_WORK}/
+
+# Build camel-k
+RUN [ "/bin/bash", "-lc", "cd ${CAMEL_K_WORK} && make ci-build" ]
+
+# ----------------------------------------------------------------------------
+
+# Final Image
+
+FROM registry.redhat.io/ubi8/openjdk-11:latest
+
+ENV CAMEL_K_VERSION=1.6.4 \
+    CAMEL_K_RUNTIME_VERSION=1.9.0 \
+    CAMEL_QUARKUS_VERSION=2.2.1 \
+    CAMEL_VERSION=3.11.5 \
+    IMAGE_NAME=registry.redhat.io/integration/camel-k-rhel8-operator \
+    CAMEL_K_TAG=camel-k-1.6.4 \
+    ARTIFACTS=/tmp/artifacts \
+    ARTIFACTS_M2=/tmp/artifacts/m2
+
+ENV CAMEL_K_RUNTIME_ZIP=apache-camel-k-runtime-${CAMEL_K_RUNTIME_VERSION}-m2.zip
+
+LABEL name="integration/camel-k-rhel8-operator" \
+      version="${CAMEL_K_VERSION}" \
+      maintainer="Otavio Piske <opiske@redhat.com>" \
+      summary="Red Hat Integration - Camel K is a lightweight integration platform, born on Kubernetes, with serverless superpowers." \
+      description="Red Hat Integration - Camel K is a lightweight integration platform, born on Kubernetes, with serverless superpowers." \
+      com.redhat.component="fuse-camel-k-operator-container" \
+      io.k8s.display-name="Red Hat Integration - Camel K" \
+      io.openshift.tags="fuse,integration,camel"\
+      fuse.camel.quarkus.version="${CAMEL_QUARKUS_VERSION}"\
+      fuse.camel.version="${CAMEL_VERSION}"\
+      fuse.camel-k.runtime.version="${CAMEL_K_RUNTIME_VERSION}"\
+      fuse.camel-k.tag="${CAMEL_K_TAG}"
+
+USER 185
+
+#
+# TODO
+# kamelets should already be generated and provided
+#
+COPY build/_kamelets /kamelets
+
+#
+# TODO
+# camel-k-runtime should already be generated and provided
+#
+COPY ${CAMEL_K_RUNTIME_ZIP} /tmp/
+
+RUN mkdir -p ${ARTIFACTS_M2} \
+    && cd ${ARTIFACTS_M2} \
+    && unzip -q /tmp/${CAMEL_K_RUNTIME_ZIP} \
+    && chgrp 185 ${ARTIFACTS}/ \
+    && find ${ARTIFACTS} -type d -exec chmod 777 {} \;
+
+USER root
+
+#
+# Clean up camel-k runtime zip
+#
+RUN rm /tmp/${CAMEL_K_RUNTIME_ZIP}
+
+#
+# TODO
+# maven_overlay should be generated and provided
+#
+COPY build/_maven_overlay/ /usr/share/maven/lib/
+
+#
+# Configure logback
+#
+ADD build/logback.xml /usr/share/maven/conf/
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Dlogback.configurationFile=/usr/share/maven/conf/logback.xml"
+
+USER 185
+
+#
+# Copy the build kamel binary
+#
+COPY --from=builder /go/src/github.com/apache/camel-k/kamel /usr/local/bin/kamel
+
+#
+# Copy the built licenced directory
+#
+COPY --from=builder /go/src/github.com/apache/camel-k/licenses /root/licenses/fuse-camel-k/licenses
+
+ENV PATH "$PATH:/usr/local/bin"
+CMD ["kamel", "operator"]
