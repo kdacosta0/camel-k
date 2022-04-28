@@ -27,7 +27,6 @@
     <name>Red Hat :: Integration :: Camel-K</name>
 
     <properties>
-        <version.camel-k.release>1.6.0</version.camel-k.release>
         <git.commit.id>c77f7aecbd4497187695a41d89f288d494fa9d06</git.commit.id>
     </properties>
 </project>
