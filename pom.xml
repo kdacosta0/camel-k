@@ -21,7 +21,7 @@
 
     <groupId>com.redhat.integration.camel.k</groupId>
     <artifactId>camel-k-version</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Red Hat :: Integration :: Camel-K</name>
