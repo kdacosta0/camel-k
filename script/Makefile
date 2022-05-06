@@ -15,7 +15,8 @@
 
 VERSIONFILE := pkg/util/defaults/defaults.go
 VERSION := 1.7.0
-LAST_RELEASED_VERSION := 1.6.4
+LAST_RELEASED_VERSION := 1.6.6
+RHI_VERSION := 2022Q3
 RUNTIME_VERSION := 1.9.0
 LAST_RELEASED_IMAGE_NAME := red-hat-camel-k-operator
 BUILDAH_VERSION := 1.14.0
@@ -59,7 +60,7 @@ CHANNELS ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x"),candidate,s
 DEFAULT_CHANNEL ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x")
 PACKAGE := red-hat-camel-k
 CSV_VERSION := $(CUSTOM_VERSION:-SNAPSHOT=)
-CSV_NAME := $(PACKAGE).v$(CSV_VERSION)
+CSV_NAME := $(PACKAGE)-operator.v$(CSV_VERSION)
 CSV_DISPLAY_NAME := Red Hat Integration - Camel K
 CSV_SUPPORT := Camel
 CSV_REPLACES := $(LAST_RELEASED_IMAGE_NAME).v$(LAST_RELEASED_VERSION)
@@ -482,6 +483,7 @@ pre-bundle:
 	@sed -i 's/^  version: .*/  version: $(CSV_VERSION)/' $(CSV_PATH)
 # update the patch label file before applying it
 	@sed -i 's/^        rht.comp_ver:.*/        rht.comp_ver: $(CUSTOM_VERSION)/' $(ADD_REDHAT_LABELS_PATCH)
+	@sed -i 's/^        rht.prod_ver:.*/        rht.prod_ver: $(RHI_VERSION)/' $(ADD_REDHAT_LABELS_PATCH)
 
 bundle: set-version generate-crd kustomize operator-sdk pre-bundle $(BUNDLE_CAMEL_APIS)
 	@# Sets the operator image to the preferred image:tag
