@@ -14,7 +14,7 @@
 # limitations under the License.
 
 VERSIONFILE := pkg/util/defaults/defaults.go
-VERSION := 1.7.0
+VERSION := 1.7.1
 LAST_RELEASED_VERSION := 1.6.6
 RHI_VERSION := 2022.Q3
 RUNTIME_VERSION := 1.9.0
