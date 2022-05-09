@@ -22,7 +22,7 @@ LAST_RELEASED_IMAGE_NAME := red-hat-camel-k-operator
 BUILDAH_VERSION := 1.14.0
 KANIKO_VERSION := 0.17.1
 INSTALL_DEFAULT_KAMELETS := true
-CONTROLLER_GEN_VERSION := v0.4.1
+CONTROLLER_GEN_VERSION := v0.6.1
 OPERATOR_SDK_VERSION := v1.14.0
 KUSTOMIZE_VERSION := v4.1.2
 BASE_IMAGE := registry.access.redhat.com/ubi8/openjdk-11:1.10
@@ -60,7 +60,7 @@ CHANNELS ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x"),candidate,s
 DEFAULT_CHANNEL ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x")
 PACKAGE := red-hat-camel-k
 CSV_VERSION := $(CUSTOM_VERSION:-SNAPSHOT=)
-CSV_NAME := $(PACKAGE)-operator.v$(CSV_VERSION)
+CSV_NAME := $(PACKAGE).v$(CSV_VERSION)
 CSV_DISPLAY_NAME := Red Hat Integration - Camel K
 CSV_SUPPORT := Camel
 CSV_REPLACES := $(LAST_RELEASED_IMAGE_NAME).v$(LAST_RELEASED_VERSION)
