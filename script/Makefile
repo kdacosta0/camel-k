@@ -16,7 +16,8 @@
 VERSIONFILE := pkg/util/defaults/defaults.go
 VERSION ?= 1.8.0
 OPERATOR_VERSION := $(subst -SNAPSHOT,,$(VERSION))
-LAST_RELEASED_VERSION := 1.8.2
+LAST_RELEASED_IMAGE_NAME := red-hat-camel-k-operator
+LAST_RELEASED_VERSION := 1.6.7
 RUNTIME_VERSION := 1.12.0
 BUILDAH_VERSION := 1.14.0
 KANIKO_VERSION := 0.17.1
@@ -346,7 +347,7 @@ git-tag:
 	./script/git_tag.sh $(CUSTOM_VERSION) $(RELEASE_GIT_REMOTE)
 
 cross-compile:
-	# we must wrap the goldflags parameters with quotes as they will need to 
+	# we must wrap the goldflags parameters with quotes as they will need to
 	# be processed as a single argument by the cross compile script
 	./script/cross_compile.sh $(CUSTOM_VERSION) $(subst ","\",$(GOFLAGS))
 
