@@ -401,7 +401,7 @@ endif
 
 kubectl:
 ifeq (, $(shell command -v kubectl))
-$(error "No kubectl found in PATH. Please install and re-run")
+	$(error "No kubectl found in PATH. Please install and re-run")
 endif
 
 kustomize:
