@@ -37,7 +37,7 @@ IMAGE_NAME := registry-proxy.engineering.redhat.com/rh-osbs/integration-camel-k-
 # - need to preserve original image and version as used in other files
 #
 CUSTOM_IMAGE ?= $(IMAGE_NAME)
-CUSTOM_VERSION ?= $(VERSION)
+CUSTOM_VERSION ?= 1.8.0
 OPERATOR_VERSION := $(subst -SNAPSHOT,,$(CUSTOM_VERSION))
 CUSTOM_TAG ?= $(OPERATOR_VERSION)
 
