@@ -17,7 +17,7 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: camel-k-operator-knative-eventing
+  name: camel-k-operator-knative-eventing-webhook
   namespace: knative-eventing
   labels:
     app: "camel-k"
@@ -27,5 +27,5 @@ subjects:
     namespace: placeholder
 roleRef:
   kind: Role
-  name: camel-k-operator-knative-eventing
+  name: camel-k-operator-knative-eventing-webhook
   apiGroup: rbac.authorization.k8s.io
