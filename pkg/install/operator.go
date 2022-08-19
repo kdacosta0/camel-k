@@ -251,7 +251,9 @@ func OperatorOrCollect(ctx context.Context, c client.Client, cfg OperatorConfigu
 			return err
 		}
 		if err = installNamespacedRoleBinding(ctx, c, collection, cfg.Namespace, "/rbac/operator-role-binding-knative-eventing-webhook.yaml"); err != nil {
-			fmt.Printf("Warning: the operator won't be able to detect Knative settings from knative-eventing namespace. Error: %s\n", errors.Cause(err))
+			if !k8serrors.IsAlreadyExists(err) {
+				fmt.Printf("Warning: the operator won't be able to detect Knative settings from knative-eventing namespace. Error: %s\n", errors.Cause(err))
+			}
 		}
 		if err := installClusterRoleBinding(ctx, c, collection, cfg.Namespace, "camel-k-operator-bind-addressable-resolver", "/rbac/operator-cluster-role-binding-addressable-resolver.yaml"); err != nil {
 			if k8serrors.IsForbidden(err) {
@@ -362,7 +364,6 @@ func installNamespacedRoleBinding(ctx context.Context, c client.Client, collecti
 	return c.Create(ctx, target)
 }
 
-
 func installClusterRoleBinding(ctx context.Context, c client.Client, collection *kubernetes.Collection, namespace string, name string, path string) error {
 	var target *rbacv1.ClusterRoleBinding
 	existing, err := c.RbacV1().ClusterRoleBindings().Get(ctx, name, metav1.GetOptions{})
@@ -399,7 +400,7 @@ func installClusterRoleBinding(ctx context.Context, c client.Client, collection 
 				bound = true
 
 				break
-			} else if subject.Namespace == "" {
+			} else if subject.Namespace == "" || subject.Namespace == "placeholder" {
 				target.Subjects[i].Namespace = namespace
 				bound = true
 
