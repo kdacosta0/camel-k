@@ -42,7 +42,6 @@ import (
 	serving "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/apache/camel-k/pkg/client"
-	"github.com/apache/camel-k/pkg/util/envvar"
 	util "github.com/apache/camel-k/pkg/util/kubernetes"
 )
 
@@ -210,9 +209,8 @@ func getSinkURI(ctx context.Context, c client.Client, sink *corev1.ObjectReferen
 	return addressURL.String(), nil
 }
 
-// EnableKnativeBindInNamespace sets the "bindings.knative.dev/include=true" label to the namespace if ALL of the conditions are met:
-// * There aren't any of these labels bindings.knative.dev/include bindings.knative.dev/exclude in the namespace
-// * The environment variable SINK_BINDING_SELECTION_MODE should be set to inclusion in deploy/eventing-webhook of knative-eventing namespace
+// EnableKnativeBindInNamespace sets the "bindings.knative.dev/include=true" label to the namespace
+// if there aren't any of these labels bindings.knative.dev/include bindings.knative.dev/exclude in the namespace
 // Returns true if the label was set in the namespace
 // see https://knative.dev/v1.3-docs/eventing/custom-event-source/sinkbinding/create-a-sinkbinding/
 func EnableKnativeBindInNamespace(ctx context.Context, client client.Client, namespace string) (bool, error) {
@@ -227,23 +225,6 @@ func EnableKnativeBindInNamespace(ctx context.Context, client client.Client, nam
 		return false, nil
 	}
 
-	eventingWebhook, err := client.AppsV1().Deployments("knative-eventing").Get(ctx, "eventing-webhook", metav1.GetOptions{})
-	if err != nil {
-		return false, err
-	}
-	inclusionMode := false
-	for _, c := range eventingWebhook.Spec.Template.Spec.Containers {
-		if c.Name == "eventing-webhook" {
-			if sinkBindingSelectionMode := envvar.Get(c.Env, "SINK_BINDING_SELECTION_MODE"); sinkBindingSelectionMode != nil {
-				inclusionMode = sinkBindingSelectionMode.Value == "inclusion"
-			}
-			break
-		}
-	}
-	// only proceeds if the sinkbinding mode is inclusion
-	if !inclusionMode {
-		return false, err
-	}
 	var jsonLabelPatch = map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"labels": map[string]string{"bindings.knative.dev/include": "true"},
