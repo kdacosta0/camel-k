@@ -14,7 +14,7 @@
 # limitations under the License.
 
 VERSIONFILE := pkg/util/defaults/defaults.go
-VERSION ?= 1.8.0
+VERSION ?= 1.8.1
 LAST_RELEASED_IMAGE_NAME := red-hat-camel-k-operator
 LAST_RELEASED_VERSION := 1.6.7
 RUNTIME_VERSION ?= 1.12.0
