@@ -25,12 +25,12 @@ github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
 # github.com/Microsoft/hcsshim v0.8.23
 github.com/Microsoft/hcsshim/osversion
-# github.com/apache/camel-k/pkg/apis/camel v1.8.0 => ./pkg/apis/camel
+# github.com/apache/camel-k/pkg/apis/camel v1.8.1 => ./pkg/apis/camel
 ## explicit
 github.com/apache/camel-k/pkg/apis/camel/v1
 github.com/apache/camel-k/pkg/apis/camel/v1/knative
 github.com/apache/camel-k/pkg/apis/camel/v1alpha1
-# github.com/apache/camel-k/pkg/client/camel v1.8.0 => ./pkg/client/camel
+# github.com/apache/camel-k/pkg/client/camel v1.8.1 => ./pkg/client/camel
 ## explicit
 github.com/apache/camel-k/pkg/client/camel/clientset/versioned
 github.com/apache/camel-k/pkg/client/camel/clientset/versioned/fake
@@ -39,7 +39,7 @@ github.com/apache/camel-k/pkg/client/camel/clientset/versioned/typed/camel/v1
 github.com/apache/camel-k/pkg/client/camel/clientset/versioned/typed/camel/v1/fake
 github.com/apache/camel-k/pkg/client/camel/clientset/versioned/typed/camel/v1alpha1
 github.com/apache/camel-k/pkg/client/camel/clientset/versioned/typed/camel/v1alpha1/fake
-# github.com/apache/camel-k/pkg/kamelet/repository v1.8.0 => ./pkg/kamelet/repository
+# github.com/apache/camel-k/pkg/kamelet/repository v1.8.1 => ./pkg/kamelet/repository
 ## explicit
 github.com/apache/camel-k/pkg/kamelet/repository
 # github.com/beorn7/perks v1.0.1
