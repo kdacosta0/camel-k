@@ -38,10 +38,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          # We need to provide either a Personal Access Token or a SSH Key as suggested in
+          # https://medium.com/prompt/trigger-another-github-workflow-without-using-a-personal-access-token-f594c21373ef
           ssh-key: "${{ secrets.PUSH_KEY }}"
-          # We must use a Personal Access Token as the upstream commits can have changes the workflow code.
-          # For security reasons, usage of github.token is not allowed in such circumstances (it may change in the future)
-          # token: ${{ secrets.MY_PAT }}
           ref: ${{ github.ref }}
           fetch-depth: 0
           persist-credentials: true
