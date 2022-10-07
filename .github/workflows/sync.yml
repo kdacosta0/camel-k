@@ -17,7 +17,6 @@
 # limitations under the License.
 name: sync
 
-permissions: write-all
 on:
   schedule:
     - cron: "22 22 * * *"
@@ -39,6 +38,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          ssh-key: "${{ secrets.PUSH_KEY }}"
           # We must use a Personal Access Token as the upstream commits can have changes the workflow code.
           # For security reasons, usage of github.token is not allowed in such circumstances (it may change in the future)
           # token: ${{ secrets.MY_PAT }}
