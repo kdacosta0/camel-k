@@ -26,7 +26,7 @@ jobs:
   sync:
     strategy:
       matrix:
-        branch: ["release-1.8.x", "release-1.9.x", "release-1.10.x"]
+        branch: ["release-1.8.x", "release-1.11.x", "release-1.10.x"]
     runs-on: ubuntu-20.04
     steps:
       - name: Set up JDK 11
