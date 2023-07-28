@@ -15,14 +15,8 @@
 # limitations under the License.
 # ---------------------------------------------------------------------------
 
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-resources:
-- operator-deployment.yaml
-- operator-service-account.yaml
-
-patchesStrategicMerge:
-- patch-toleration.yaml
-- patch-node-selector.yaml
-- patch-resource-requirements.yaml
+$patch: delete
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: camel-k-edit
