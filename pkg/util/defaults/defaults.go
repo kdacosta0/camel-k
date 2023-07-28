@@ -23,25 +23,25 @@ package defaults
 
 const (
 	// Version --
-	Version = "2.0.1-SNAPSHOT"
+	Version = "2.0.0"
 
 	// DefaultRuntimeVersion --
-	DefaultRuntimeVersion = "2.16.0"
+	DefaultRuntimeVersion = "1.15.4"
 
 	// BuildahVersion --
-	BuildahVersion = "1.30.0"
+	BuildahVersion = "1.14.0"
 
 	// KanikoVersion --
-	KanikoVersion = "1.9.1"
+	KanikoVersion = "0.17.1"
 
 	// baseImage --
-	baseImage = "eclipse-temurin:11"
+	baseImage = "adoptopenjdk/openjdk11:slim"
 
 	// LocalRepository --
-	LocalRepository = "/etc/maven/m2"
+	LocalRepository = "/tmp/artifacts/m2"
 
 	// ImageName --
-	ImageName = "docker.io/apache/camel-k"
+	ImageName = "registry-proxy.engineering.redhat.com/rh-osbs/integration-camel-k-rhel8-operator"
 
 	// installDefaultKamelets --
 	installDefaultKamelets = true
