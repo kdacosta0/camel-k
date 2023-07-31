@@ -302,9 +302,7 @@ build-submodules:
 	./script/build_submodules.sh
 
 build-compile-integration-tests:
-	go test -run nope -tags="integration" ./e2e/global/... > /dev/null
-	go test -run nope -tags="integration" ./e2e/local/... > /dev/null
-	go test -run nope -tags="integration" ./e2e/namespace/... > /dev/null
+	go test -run nope -tags="integration" ./e2e/...
 
 clean:
 	# disable gomodules when executing go clean:
