@@ -51,8 +51,8 @@ LINT_DEADLINE := 10m
 MANAGER := config/manager
 MANIFESTS := config/manifests
 BUNDLE_DIR := bundle
-CHANNELS ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x"),candidate,latest
-DEFAULT_CHANNEL ?= $(shell v=$(OPERATOR_VERSION) && echo "$${v%\.[0-9]}.x")
+DEFAULT_CHANNEL ?= $(shell echo "stable-v$(word 1,$(subst ., ,$(lastword $(OPERATOR_VERSION))))")
+CHANNELS ?= $(DEFAULT_CHANNEL),latest
 PACKAGE := red-hat-camel-k
 CSV_VERSION := $(CUSTOM_VERSION:-SNAPSHOT=)
 CSV_NAME := $(PACKAGE).v$(CSV_VERSION)
