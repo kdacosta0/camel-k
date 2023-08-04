@@ -84,7 +84,7 @@ LABEL %%
         io.k8s.display-name="red-hat-camel-k bundle" %%
         io.k8s.description="bundle containing manifests for red-hat-camel-k" %%
         summary="bundle containing manifests for red-hat-camel-k" %%
-        maintainer="Thomas Cunningham <tcunning@redhat.com>"
+        maintainer="Pasquale Congiusti <pcongius@redhat.com>"
 EOF
 ) -i -- "${dockerfile}"
 
